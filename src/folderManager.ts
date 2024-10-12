@@ -1,17 +1,17 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
 import * as path from 'path';
-import { templatepy, templateHTML } from './templateManager';
+import { templatepy, templateHTML, templatemainHTML } from './templateManager';
 
 export function createBlueprint(result: string) {
-    let directorioProyecto: string | undefined;
+    let directoryProject: string | undefined;
     let routeFolder: string | undefined;
     let routeBlueprint: string | undefined;
 
     if (vscode.workspace.workspaceFolders) {
-        directorioProyecto = vscode.workspace.workspaceFolders[0].uri.fsPath;
+        directoryProject = vscode.workspace.workspaceFolders[0].uri.fsPath;
 
-        routeBlueprint = path.join(directorioProyecto, 'blueprints');
+        routeBlueprint = path.join(directoryProject, 'blueprints');
         routeFolder = path.join(routeBlueprint, result);
 
         if (!fs.existsSync(routeBlueprint)) {
@@ -19,6 +19,20 @@ export function createBlueprint(result: string) {
         }
 
         if (!fs.existsSync(routeFolder)) {
+
+            //Creaciòn del archivo main
+            const routerFileMainPy = path.join(directoryProject, `main.py`) 
+
+            if (!fs.existsSync(routerFileMainPy)) {
+                const FolderStatic = path.join(directoryProject, `static`) 
+                fs.mkdirSync(FolderStatic);
+
+
+                const mainPy = templatemainHTML(result);
+                fs.writeFileSync(routerFileMainPy, mainPy);
+            }
+
+
             fs.mkdirSync(routeFolder);
             
             // Creación del archivo Python
